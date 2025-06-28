@@ -20,7 +20,7 @@ std::vector<Move> MoveComputer::getLegalMovesForPos(const Board& board, const Po
             if(valid)
             legalMoves.push_back(moveToCheck);
             r += dir.dRow;
-            c += pos.col + dir.dCol;
+            c += dir.dCol;
         }
     }
     return legalMoves;
@@ -56,13 +56,11 @@ bool MoveComputer::isEatMove(const Board& board, Move& validMove, Color playerCo
     for (int i = 0; i < std::abs(validMove.from.row - validMove.to.row) - 1; i++) {
         currentPoint.row += stepX;
         currentPoint.col += stepY;
-        if(!board.isEmpty(currentPoint) && board.getPiece(currentPoint)->getColor() == piece->getColor()) return false;
-        else if(!board.isEmpty(currentPoint)){
-            if(isOpponentPiece) return false;
-            else isOpponentPiece = true;
+        if(!board.isEmpty(currentPoint)){
+            return true;
         }
     }
-    return true;
+    return false;
 }
 
 std::vector<Move> MoveComputer::getChainJumps(const Board& board, std::vector<Move> moves, Color playerColor){

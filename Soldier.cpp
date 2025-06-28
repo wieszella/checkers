@@ -33,7 +33,7 @@ bool Soldier::isValidMove(const Board& board, const Move& move, Color playerColo
             int midRow = (move.from.row + move.to.row) / 2;
             int midCol = (move.from.col + move.to.col) / 2;
             auto betweenPiece = board.getPiece({midRow, midCol});
-            return betweenPiece->getColor() == Color::BLACK;
+            return (betweenPiece && betweenPiece->getColor() == Color::BLACK);
         }
 
         return false;
@@ -45,7 +45,7 @@ bool Soldier::isValidMove(const Board& board, const Move& move, Color playerColo
             int midRow = (move.from.row + move.to.row) / 2;
             int midCol = (move.from.col + move.to.col) / 2;
             auto betweenPiece = board.getPiece({midRow, midCol});
-            return betweenPiece->getColor() == Color::RED;
+            return (betweenPiece && betweenPiece->getColor() == Color::RED);
         }
         return false;
     }

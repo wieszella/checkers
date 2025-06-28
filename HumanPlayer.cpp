@@ -52,7 +52,7 @@ Move HumanPlayer::getChainMove(Board &board, std::vector<Move> jumps){
     if (!jumps.empty()) {
         do{
             std::cout << "Jump available. Chain? (y/n): ";
-            response = toupper(getchar());
+            while((response = toupper(getchar())) == '\n');
         }while(response != 'Y' && response != 'N');
         
         if(response == 'Y'){

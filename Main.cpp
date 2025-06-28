@@ -3,12 +3,13 @@
 #include "Game.h"
 #include "HumanPlayer.h"
 #include "Player.h"
+#include "AIPlayer.h"
 
 int main() {
     std::cout << "Welcome to Console Checkers!\n\n";
 
     std::shared_ptr<Player> redPlayer = std::make_shared<HumanPlayer>();
-    std::shared_ptr<Player> blackPlayer = std::make_shared<HumanPlayer>();
+    std::shared_ptr<Player> blackPlayer = std::make_shared<AIPlayer>(Color::BLACK, Color::RED);
 
     // Start game
     Game game(std::move(redPlayer), std::move(blackPlayer));

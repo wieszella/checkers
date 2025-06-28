@@ -11,17 +11,17 @@ void Game::switchTurn(){
 }
 
 void Game::eat(const Move &move){
-        // Determine the step direction for x and y
-        int stepX = ((move.from.row - move.to.row) > 0) ? -1 : 1;
-        int stepY = ((move.from.col - move.to.col) > 0) ? -1 : 1;
+    // Determine the step direction for x and y
+    int stepX = ((move.from.row - move.to.row) > 0) ? -1 : 1;
+    int stepY = ((move.from.col - move.to.col) > 0) ? -1 : 1;
 
-        Position currentPoint = move.from;
+    Position currentPoint = move.from;
 
-        for (int i = 0; i < std::abs(move.from.row - move.to.row) - 1; i++) {
-            currentPoint.row += stepX;
-            currentPoint.col += stepY;
-            board.removePiece(currentPoint);
-        }
+    for (int i = 0; i < std::abs(move.from.row - move.to.row) - 1; i++) {
+        currentPoint.row += stepX;
+        currentPoint.col += stepY;
+        board.removePiece(currentPoint);
+    }
 }
 
 void Game::play() {
