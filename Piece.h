@@ -28,7 +28,7 @@ public:
     virtual ~Piece() = 0;
     virtual Color getColor() const;
     virtual char getSymbol()const;
-    virtual std::vector<Direction> getDirections()const;
+    virtual std::vector<Direction> getDirections()const=0;
 
 
     // Check if the move is legal for a given color
@@ -36,5 +36,5 @@ public:
     // Get all valid moves for a specific piece at pos
     virtual std::vector<Move> getLegalMoves(const Board& board, const Position& pos)=0;
     // Get all jump moves for a given position - chain only
-    virtual std::vector<Move> getChainJumpMoves(const Board& board, const Position& pos)=0;
+    // virtual std::vector<Move> getChainJumpMoves(const Board& board, const Position& pos)=0; // TODO - implement
 };

@@ -1,4 +1,7 @@
 #pragma once
+// Forward declarations
+class Piece;
+
 #include <memory>
 #include <vector>
 #include "Piece.h"

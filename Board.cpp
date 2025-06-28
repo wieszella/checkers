@@ -19,11 +19,11 @@ void Board::setup(){
             {
                 if (row < SOLDIER_ROWS) 
                 {
-                    grid[row][col] = std::make_shared<Soldier>(Color::RED, "r");
+                    grid[row][col] = std::make_shared<Soldier>(Color::RED, 'r');
                 }
                 else if (row >= BOARD_SIZE - SOLDIER_ROWS)
                 {
-                    grid[row][col] = std::make_shared<Soldier>(Color::BLACK, "b");
+                    grid[row][col] = std::make_shared<Soldier>(Color::BLACK, 'b');
                 }
             }
         }
@@ -56,9 +56,9 @@ void Board::movePiece(const Position& from, const Position& to){
         removePiece(from);
     
         if(grid[to.row][to.col]->getColor() == Color::RED && to.row == BOARD_SIZE-1)
-            grid[to.row][to.col] = std::make_shared<King>(Color::RED, "R");
+            grid[to.row][to.col] = std::make_shared<King>(Color::RED, 'R');
         if(grid[to.row][to.col]->getColor() == Color::BLACK && to.row == 0)
-            grid[to.row][to.col] = std::make_shared<King>(Color::BLACK, "B");
+            grid[to.row][to.col] = std::make_shared<King>(Color::BLACK, 'B');
     }
 }
 

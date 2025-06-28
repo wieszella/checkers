@@ -2,6 +2,8 @@
 
 Piece::Piece(Color color, char c) : color(color), symbol(c){}
 
+Piece::~Piece()=default; // TODO - why??
+
 char Piece::getSymbol()const
 {
     return symbol;

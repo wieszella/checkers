@@ -1,7 +1,7 @@
 #include "Soldier.h"
 #include <cmath>
 
-Soldier::Soldier(Color Color, char symbol) : Piece(color, symbol)
+Soldier::Soldier(Color color, char symbol) : Piece(color, symbol)
 {
     const std::vector<Direction> RED_DIRECTIONS = {{1, -1}, {1, 1}};
     const std::vector<Direction> BLACK_DIRECTIONS = {{-1, -1}, {-1, 1}};   
@@ -26,19 +26,20 @@ bool Soldier::isValidMove(const Board& board, const Move& move, Color playerColo
     // TODO - replace if color to generic direction
     if(piece->getColor() == Color::RED)
     {
-        if(move.from.row == move.to.row + 1 && abs(move.from.col - move.to.col) == 1) return true; //normal step
-        if(move.from.row == move.to.row + 2 && abs(move.from.col - move.to.col) == 2){ //eat
+        if(move.from.row == move.to.row - 1 && abs(move.from.col - move.to.col) == 1) return true; //normal step
+        if(move.from.row == move.to.row - 2 && abs(move.from.col - move.to.col) == 2){ //eat
             int midRow = (move.from.row + move.to.row) / 2;
             int midCol = (move.from.col + move.to.col) / 2;
             auto betweenPiece = board.getPiece({midRow, midCol});
             return betweenPiece->getColor() == Color::BLACK;
         }
+
         return false;
     }
     else
     {
-        if(move.from.row == move.to.row - 1 && abs(move.from.col - move.to.col) == 1) return true; //normal step
-        if(move.from.row == move.to.row - 2 && abs(move.from.col - move.to.col) == 2){ //eat
+        if(move.from.row == move.to.row + 1 && abs(move.from.col - move.to.col) == 1) return true; //normal step
+        if(move.from.row == move.to.row + 2 && abs(move.from.col - move.to.col) == 2){ //eat
             int midRow = (move.from.row + move.to.row) / 2;
             int midCol = (move.from.col + move.to.col) / 2;
             auto betweenPiece = board.getPiece({midRow, midCol});
