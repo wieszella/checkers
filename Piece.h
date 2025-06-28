@@ -28,13 +28,6 @@ public:
     virtual ~Piece() = 0;
     virtual Color getColor() const;
     virtual char getSymbol()const;
-    virtual std::vector<Direction> getDirections()const=0;
-
-
-    // Check if the move is legal for a given color
-    virtual bool isValidMove(const Board& board, const Move& move, Color playerColor)const = 0;
-    // Get all valid moves for a specific piece at pos
-    virtual std::vector<Move> getLegalMoves(const Board& board, const Position& pos)=0;
-    // Get all jump moves for a given position - chain only
-    // virtual std::vector<Move> getChainJumpMoves(const Board& board, const Position& pos)=0; // TODO - implement
+    virtual std::vector<Direction> getDirections()const;
+    virtual bool (*getValidator())(const Board& board, const Move &move, Color color)=0;
 };

@@ -1,17 +1,10 @@
 #include "Game.h"
 #include <iostream>
 
-Game::Game(std::unique_ptr<Player> red, std::unique_ptr<Player> black) // TODO - go over initilizer
+Game::Game(std::shared_ptr<Player> red, std::shared_ptr<Player> black) // TODO - go over initilizer
     : redPlayer(std::move(red)), blackPlayer(std::move(black)), currentTurn(Color::RED) {
     board.setup();
 }
-
-// Game::Game(std::unique_ptr<Player> red, std::unique_ptr<Player> black) : 
-// {
-//     currentTurn = Color::RED;
-//     board = Board();
-//     board.setup();
-// }
 
 void Game::switchTurn(){
     currentTurn = (currentTurn == Color::RED) ? Color::BLACK : Color::RED;
@@ -46,14 +39,13 @@ void Game::play() {
 
         Move move;
         bool valid = false;
-
+        auto player = (currentTurn == Color::RED) ? redPlayer : blackPlayer;
         //intake players move
         do {
-            move = (currentTurn == Color::RED)
-                ? redPlayer->getMove(board)
-                : blackPlayer->getMove(board);
-
-            valid =  (!board.isEmpty(move.from) && board.getPiece(move.from)->isValidMove(board, move, currentTurn));
+            move =player->getMove(board);
+            
+            auto validator = board.getPiece(move.from)->getValidator();
+            valid = validator(board, move, currentTurn);
 
             if (!valid) {
                 std::cout << "Invalid move. Try again.\n";
@@ -64,20 +56,20 @@ void Game::play() {
         //apply the move
         board.movePiece(move.from, move.to);
 
-        // if a jump accured- handle eating
-        if (abs(move.from.row - move.to.row) > 1) {
+        while (MoveComputer::isEatMove(board, move, currentTurn)) {
             //clear the pieces between the positions of the jump
             eat(move);
 
             // TODO! - implement chain eating 
-            // Ask if player wants to continue- chain eating
-            // auto jumps = MoveValidator::getChainJumpMoves(board, move.to);
-            // if (!jumps.empty()) {
-            //     std::cout << "Jump available. Chain? (y/n): ";
-            //     // If yes, allow another move using only jump options
-            // }
-        }
+            auto moves = MoveComputer::getLegalMovesForPos(board, move.to);
+            auto jumps = MoveComputer::getChainJumps(board, moves, currentTurn);
 
+            move = player->getChainMove(board, jumps);
+
+            if (!move.empty){
+                board.movePiece(move.from, move.to);
+            }  
+        }
         switchTurn();
     }
 }

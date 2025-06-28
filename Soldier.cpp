@@ -5,15 +5,17 @@ Soldier::Soldier(Color color, char symbol) : Piece(color, symbol)
 {
     const std::vector<Direction> RED_DIRECTIONS = {{1, -1}, {1, 1}};
     const std::vector<Direction> BLACK_DIRECTIONS = {{-1, -1}, {-1, 1}};   
-    direction = color == Color::RED ? RED_DIRECTIONS : BLACK_DIRECTIONS;
+    direction = color == Color::RED ? RED_DIRECTIONS : BLACK_DIRECTIONS;  
 }
 
-std::vector<Direction> Soldier::getDirections()const{
-    return direction;
+bool (*Soldier::getValidator())(const Board& board, const Move &move, Color color)
+{
+    return Soldier::isValidMove;
 }
 
-bool Soldier::isValidMove(const Board& board, const Move& move, Color playerColor)const{
-    //the validation that both "from" and "to" are in the board is done outside this function
+bool Soldier::isValidMove(const Board& board, const Move& move, Color playerColor){
+    if(!board.isInsideBoard(move.from) || !board.isInsideBoard(move.to)) return false;
+
     auto piece = board.getPiece(move.from);
     
     //check if a player chose a piece that belongs to him
@@ -48,35 +50,3 @@ bool Soldier::isValidMove(const Board& board, const Move& move, Color playerColo
         return false;
     }
 }
-
-std::vector<Move> Soldier::getLegalMoves(const Board& board, const Position& pos){
-    std::vector<Move> legalMoves;
-    auto piece = board.getPiece(pos);
-    if (!piece) return legalMoves;
-
-    Color color = piece->getColor();
-
-    // Check normal (non-jump) moves
-    for (const auto& dir : direction) {
-        Position to{pos.row + dir.dRow, pos.col + dir.dCol};
-        if (board.isInsideBoard(to) && board.isEmpty(to)) {
-            legalMoves.push_back({pos, to});
-        }
-    }
-
-    // Check jump moves
-    for (const auto& dir : direction) {
-        Position over{pos.row + dir.dRow, pos.col + dir.dCol};
-        Position to{pos.row + 2 * dir.dRow, pos.col + 2 * dir.dCol};
-
-        if (!board.isInsideBoard(to)) continue;
-
-        auto middle = board.getPiece(over);
-        if (middle && middle->getColor() != color && board.isEmpty(to)) {
-            legalMoves.push_back({pos, to});
-        }
-    }
-    return legalMoves;
-}
-// TODO - implement
-// std::vector<Move> Soldier::getChainJumpMoves(const Board& board, const Position& pos);

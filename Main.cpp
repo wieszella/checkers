@@ -7,8 +7,8 @@
 int main() {
     std::cout << "Welcome to Console Checkers!\n\n";
 
-    std::unique_ptr<Player> redPlayer = std::make_unique<HumanPlayer>();
-    std::unique_ptr<Player> blackPlayer = std::make_unique<HumanPlayer>();
+    std::shared_ptr<Player> redPlayer = std::make_shared<HumanPlayer>();
+    std::shared_ptr<Player> blackPlayer = std::make_shared<HumanPlayer>();
 
     // Start game
     Game game(std::move(redPlayer), std::move(blackPlayer));

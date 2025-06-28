@@ -4,6 +4,7 @@
 
 class Player {
 public:
-    virtual Move getMove(const Board& board) = 0;
+    virtual Move getMove(Board &board) = 0;
+    virtual Move getChainMove(Board &board, std::vector<Move> jumps) = 0;
     virtual ~Player() = default;
 };

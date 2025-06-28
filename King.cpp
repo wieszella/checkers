@@ -6,12 +6,14 @@ King::King(Color color, char symbol) : Piece(color, symbol)
     direction = {{1, -1}, {1, 1}, {-1, -1}, {-1, 1}};
 }
 
-std::vector<Direction> King::getDirections()const{
-    return direction;
+bool (*King::getValidator())(const Board& board, const Move &move, Color color)
+{
+    return King::isValidMove;
 }
 
-bool King::isValidMove(const Board& board, const Move& move, Color playerColor)const{
-    //the validation that both "from" and "to" are in the board is done outside this function
+bool King::isValidMove(const Board& board, const Move& move, Color playerColor){
+    if(!board.isInsideBoard(move.from) || !board.isInsideBoard(move.to)) return false;
+    
     auto piece = board.getPiece(move.from);
     
     //check if a player chose a piece that belongs to him
@@ -42,29 +44,3 @@ bool King::isValidMove(const Board& board, const Move& move, Color playerColor)c
     }
     return true;
 }
-
-std::vector<Move> King::getLegalMoves(const Board& board, const Position& pos){
-    std::vector<Move> legalMoves;
-    auto piece = board.getPiece(pos);
-    if (!piece) return legalMoves;
-
-    Color color = piece->getColor();
-
-    for (const auto& dir : direction) {
-        int r = pos.row + dir.dRow;
-        int c = pos.col + dir.dCol;
-        
-        while (board.isInsideBoard({r, c})) {
-            Position moveTo = {r, c};
-            Move moveToCheck = {pos, moveTo};
-            if(isValidMove(board, moveToCheck, color))
-            legalMoves.push_back(moveToCheck);
-            r += dir.dRow;
-            c += pos.col + dir.dCol;
-        }
-    }
-    return legalMoves;
-}
-
-// TODO - implement
-// std::vector<Move> isValidMove::getChainJumpMoves(const Board& board, const Position& pos){}
