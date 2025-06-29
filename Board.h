@@ -16,6 +16,7 @@ private:
 
 public:
     Board();
+    Board(const Board& other);
     void setup();
     std::shared_ptr<Piece> getPiece(const Position& pos) const;
     void movePiece(const Position& from, const Position& to);

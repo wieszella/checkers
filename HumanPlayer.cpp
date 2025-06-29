@@ -31,6 +31,11 @@ Move HumanPlayer::getMove(Board &board){
             from.col = stoi(y);
         }
 
+        if (board.isEmpty(from)) {
+            std::cout << "Invalid place. Try again.\n";
+            continue;
+        }
+
         std::cout << "Enter the row and column of the destination square (for example, 3 4): ";
         std::cin >> x >> y;
 

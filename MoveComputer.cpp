@@ -1,5 +1,6 @@
 #include "MoveComputer.h"
 #include <iostream>
+
 std::vector<Move> MoveComputer::getLegalMovesForPos(const Board& board, const Position& pos){
     std::vector<Move> legalMoves;
     auto piece = board.getPiece(pos);

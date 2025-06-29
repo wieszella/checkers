@@ -5,9 +5,15 @@
 #include <iostream>
 
 Board::Board(){ //Initialize the board to an empty state (no pieces yet).
-    for (int row = BOARD_SIZE; row < BOARD_SIZE; ++row)
+    for (int row = 0; row < BOARD_SIZE; ++row)
         for (int col = 0; col < BOARD_SIZE; ++col)
             grid[row][col] = nullptr;
+}
+
+Board::Board(const Board& other) {
+    for (int row = 0; row < BOARD_SIZE; ++row)
+        for (int col = 0; col < BOARD_SIZE; ++col)
+            grid[row][col] = other.grid[row][col];
 }
 
 void Board::setup(){
