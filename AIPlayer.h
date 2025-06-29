@@ -20,8 +20,8 @@ class AIPlayer : public Player {
     int max_depth;
 public:
     AIPlayer(Color color, Color opColor);
-    std::vector<State> getGameTreesFromMoves(Board board, std::vector<Move> moves, bool AI, bool jump);
-    std::vector<State> getGameTree(Board board, bool AI, bool jump);
+    std::vector<State> getGameTreesFromMoves(Board board, std::vector<Move> moves, bool AI, bool jump, int depth);
+    std::vector<State> getGameTree(Board board, bool AI, bool jump, int depth);
     void minimax(State& state, int depth);
     std::vector<Move> getJumpMoves(State s);
     Move getMove(Board &board)override;
