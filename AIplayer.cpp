@@ -3,6 +3,8 @@
 #include "MoveExecutor.h"
 #include <iostream>
 #include <optional>
+#include <algorithm>
+#include <bits/stdc++.h>
 
 AIPlayer::AIPlayer(Color color) : color(color), opColor(color == Color::RED ? Color::BLACK : Color::RED), MAX_DEPTH(5), MAX_POINTS(10){}
 
@@ -65,40 +67,46 @@ std::vector<State> AIPlayer::buildGameTree(Board board, bool isAIPlayerTurn, int
 
 void AIPlayer::minimax(State& state, int depth) {
     if (depth >= MAX_DEPTH - 1) {
-        state.value = 0;
+        state.value = evaluate(state.board, state.AI_move);
         return;
     }
 
-    if (state.value != 0) {
-        //state.board.print();
-        //std::cout << depth << " " << ((state.AI_move) ? "AI lose" : "Human lose") << std::endl;
-        return;
-    }
-
-    int val_found;
-    if (state.AI_move) {
-        int minP, maxAI;
-        val_found = -MAX_POINTS;
-        for (State& child : state.children) {
-            minimax(child, depth+1);
-            // min(P), max(AI)
-            int val = child.value;
-            if (val > val_found) val_found = val;
-        }
-        // val = min();
-        // if (val > val_found) val_found = val;
+    int val;
+    int maxAI= getMax(state.children);
+    int minP = getMin(state.children);
+    if (state.AI_move)
+    {
+        val = std::max(maxAI, minP);
     } else {
-        val_found = MAX_POINTS;
-        for (State& child : state.children) {
-            minimax(child, depth+1);
-            int val = child.value;
-            if (val < val_found) val_found = val;
-        }
+        val = std::min(maxAI, minP);
     }
-
-    state.value = val_found;
+    state.value = val;
 }
 
+int AIPlayer::evaluate(const Board& board, bool isAI)const
+{
+    double king_weight = 2;
+    return (king_weight * board.countPieceColor(color, PieceType::KING) + board.countPieceColor(color, PieceType::SOLDIER)) - 
+        (king_weight * board.countPieceColor(opColor, PieceType::KING) + board.countPieceColor(opColor, PieceType::SOLDIER));
+}
+
+int AIPlayer::getMax(std::vector<State> children)const
+{
+    int max = - MAX_POINTS;
+    for(State child: children)
+        if(child.value > max && child.AI_move)
+            max = child.value;
+    return max;
+}
+
+int AIPlayer::getMin(std::vector<State> children)const
+{
+    int min = MAX_POINTS;
+    for(State child: children)
+        if(child.value < min && !child.AI_move)
+            min = child.value;
+    return min;
+}
 
 /////ai player functions
 std::vector<Move> AIPlayer::getJumpMoves(const State& s) {
@@ -114,7 +122,7 @@ std::vector<Move> AIPlayer::getJumpMoves(const State& s) {
 
     if (best.AI_move) {
         std::vector<Move> jumps = getJumpMoves(best);
-        jumps.push_back(best.move);
+        jumps.push_back(best.move); // TODO - should it be push back or insert
         return jumps;
     } else return {};
 }
@@ -138,6 +146,5 @@ Move AIPlayer::getMove(Board &board) {
 
 Move AIPlayer::getChainMove(Board &board, std::vector<Move> jumps) {
     if (jumps.size() == 0) return Move();
-    Move jump = jump_moves.back();
-    return jump;
+    return jump_moves.back();
 }

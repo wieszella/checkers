@@ -9,6 +9,7 @@ class Board;
 
 
 enum class Color {RED, BLACK};
+enum class PieceType {KING, SOLDIER};
 
 struct Direction {
     int dRow;
@@ -29,5 +30,6 @@ public:
     virtual char getSymbol()const;
     virtual std::vector<Direction> getDirections()const;
     
+    virtual PieceType getType()const = 0;
     virtual bool isValidMove(const Board&, const Move&, Color) const = 0;
 };

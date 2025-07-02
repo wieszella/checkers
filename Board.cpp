@@ -90,3 +90,19 @@ void Board::print() const{
         std::cout << "\n";
     }
 }
+
+int Board::countPieceColor(const Color& c, PieceType t)const{
+    int count = 0;
+    for (int row = 0; row < BOARD_SIZE; row++) 
+    {
+        for (int col = 0; col < BOARD_SIZE; col++) 
+        {
+            auto& piecePtr = grid[row][col];
+            if (!piecePtr) continue;
+
+            Color color = piecePtr->getColor();
+            if(c == color && piecePtr->getType() == t) count++;
+        }
+    }
+    return count;
+}

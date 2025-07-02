@@ -28,11 +28,15 @@ class AIPlayer : public Player {
     std::unique_ptr<MoveGenerator> moveGenerator;
     std::unique_ptr<MoveExecutor> moveExecutor;
 
+    int evaluate(const Board& board, bool isAI)const;
+    int getMax(std::vector<State> children)const;
+    int getMin(std::vector<State> children)const;
+    std::vector<State> buildGameTree(Board board, bool isAIPlayerTurn, int depth, std::optional<Position> forceJumpPos = std::nullopt);
+    void minimax(State& state, int depth);
+
 public:
     AIPlayer(Color color);
 
-    std::vector<State> buildGameTree(Board board, bool isAIPlayerTurn, int depth, std::optional<Position> forceJumpPos = std::nullopt);
-    void minimax(State& state, int depth);
 
     std::vector<Move> getJumpMoves(const State& s);
     Move getMove(Board &board)override;

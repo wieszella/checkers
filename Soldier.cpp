@@ -8,6 +8,8 @@ Soldier::Soldier(Color color, char symbol) : Piece(color, symbol)
     direction = color == Color::RED ? RED_DIRECTIONS : BLACK_DIRECTIONS;  
 }
 
+PieceType Soldier::getType()const{ return PieceType::SOLDIER;}
+
 bool Soldier::isValidMove(const Board& board, const Move& move, Color playerColor)const{
     if(!board.isInsideBoard(move.from) || !board.isInsideBoard(move.to)) return false;
 

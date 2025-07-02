@@ -1,6 +1,8 @@
 #pragma once
 // Forward declarations
 class Piece;
+enum class Color;
+enum class PieceType;
 
 #include <memory>
 #include <vector>
@@ -24,5 +26,6 @@ public:
     void removePiece(const Position& pos);
     bool isInsideBoard(const Position& pos) const;
     bool isEmpty(const Position& pos) const;
+    int countPieceColor(const Color& c, PieceType t)const;
     void print() const;
 };
