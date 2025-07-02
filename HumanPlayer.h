@@ -1,7 +1,8 @@
 #pragma once
-#include "Player.h"
+#include "IPlayer.h"
 
 class HumanPlayer : public Player {
+    bool isNumeric(const std::string& str);
 public:
     HumanPlayer();
     Move getMove(Board &board) override;

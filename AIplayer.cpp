@@ -1,77 +1,70 @@
 #include "AIPlayer.h"
-#include "MoveComputer.h"
+#include "MoveGenerator.h"
+#include "MoveExecutor.h"
 #include <iostream>
+#include <optional>
 
-AIPlayer::AIPlayer(Color color, Color opColor) : color(color), opColor(opColor), max_depth(5), max_points(10){}
+AIPlayer::AIPlayer(Color color) : color(color), opColor(color == Color::RED ? Color::BLACK : Color::RED), MAX_DEPTH(5), MAX_POINTS(10){}
 
-void print_tree(const State& s, int indent) {
+void print_tree(const State& s, int indent) { //for debug purposes
     std::cout << std::string(indent, ' ') << s.AI_move << s.value << "(" << s.move.from.row << "," << s.move.from.col << ") -> (" << s.move.to.row << "," << s.move.to.col << ")\n";
     for (const State& c : s.children) print_tree(c, indent+1);
 }
 
-void eat(Board& board, const Move &move){
-    // Determine the step direction for x and y
-    int stepX = ((move.from.row - move.to.row) > 0) ? -1 : 1;
-    int stepY = ((move.from.col - move.to.col) > 0) ? -1 : 1;
 
-    Position currentPoint = move.from;
+/////get game tree functions
+std::vector<State> AIPlayer::buildGameTree(Board board, bool isAIPlayerTurn, int depth, std::optional<Position> chainFromPos) {
+    // Base case: if depth limit reached, return empty states
+    if (depth >= MAX_DEPTH) return std::vector<State>();
 
-    for (int i = 0; i < std::abs(move.from.row - move.to.row) - 1; i++) {
-        currentPoint.row += stepX;
-        currentPoint.col += stepY;
-        board.removePiece(currentPoint);
-    }
-}
+    Color currentPlayerColor = isAIPlayerTurn ? color : opColor;
+    std::vector<Move> legalMoves;
 
-std::vector<State> AIPlayer::getGameTreesFromMoves(Board board, std::vector<Move> moves, bool AI, int depth) {
-    if (depth >= max_depth) return std::vector<State>();
+    //Get legal moves
+    if (chainFromPos.has_value()) {
+        legalMoves = moveGenerator->getLegalMovesForPos(board, chainFromPos.value());
+        legalMoves = moveGenerator->getChainJumps(board, legalMoves, currentPlayerColor);
 
-    std::vector<State> states;
-
-    for (Move m : moves) {
-        Board b = Board(board);
-        b.movePiece(m.from, m.to); 
-
-        if (MoveComputer::isEatMove(b, m, AI ? color : opColor)) {
-            eat(b, m);
-            State jumping_board = State(b, m, AI, getGameTreeJump(b, AI, m.to, depth+1));
-            State no_jumping_board = State(b, m, AI, getGameTree(b, !AI, depth+1));
-            states.push_back(jumping_board);
-            states.push_back(no_jumping_board);
-        } else {
-            State next_player_board = State(b, m, AI, getGameTree(b, !AI, depth+1));
-            states.push_back(next_player_board);
+        // If no more chain jumps from this position, it's the other player's turn
+        if (legalMoves.empty()) {
+            return buildGameTree(board, !isAIPlayerTurn, depth + 1);
+        }
+    } else {
+        legalMoves = moveGenerator->getAllLegalMoves(board, currentPlayerColor);
+        if (legalMoves.empty()) {
+            return {State(isAIPlayerTurn ? -MAX_POINTS : MAX_POINTS)};
         }
     }
 
+    //gat gameTree according to legal moves
+    std::vector<State> states;
+    for (Move m : legalMoves) {
+        Board nextBoard = Board(board); // Create a copy of the board for this move
+        bool isEat = moveGenerator->isEatMove(board, m, currentPlayerColor);
+        moveExecutor->apply(nextBoard, m);
+
+        // Check if the applied move was an eat move that might lead to further jumps
+        if (isEat) {
+            // Case 1: The current piece might have more jumps (chaining) - the AI player's turn continues.
+            State jumpingBoardState = State(nextBoard, m, isAIPlayerTurn, buildGameTree(nextBoard, isAIPlayerTurn, depth + 1, m.to));
+            states.push_back(jumpingBoardState);
+
+            // Case 2: The current player chooses NOT to make further jumps, or no more jumps are available.
+            State noJumpingBoardState = State(nextBoard, m, isAIPlayerTurn, buildGameTree(nextBoard, !isAIPlayerTurn, depth + 1));
+            states.push_back(noJumpingBoardState);
+        } else {
+            // Normal move or no further jumps possible/required after a jump - the turn switches to the other player.
+            State nextPlayerBoardState = State(nextBoard, m, isAIPlayerTurn, buildGameTree(nextBoard, !isAIPlayerTurn, depth + 1));
+            states.push_back(nextPlayerBoardState);
+        }
+    }
     return states;
 }
 
-std::vector<State> AIPlayer::getGameTreeJump(Board board, bool AI, Position pos, int depth) {
-    if (depth >= max_depth) return std::vector<State>();
-
-    Color c = AI ? color : opColor;
-    std::vector<Move> all_moves = MoveComputer::getLegalMovesForPos(board, pos);// all possible legal moves
-    all_moves = MoveComputer::getChainJumps(board, all_moves, c);
-
-    if (all_moves.empty()) return getGameTree(board, !AI, depth+1);
-
-    return getGameTreesFromMoves(board, all_moves, AI, depth);
-}
-
-std::vector<State> AIPlayer::getGameTree(Board board, bool AI, int depth) {
-    if (depth >= max_depth) return std::vector<State>();
-
-    Color c = AI ? color : opColor;
-    std::vector<Move> all_moves = MoveComputer::getAllLegalMoves(board, c);// all possible legal moves
-
-    if (all_moves.empty()) return {State(AI ? -max_points : max_points)};
-
-    return getGameTreesFromMoves(board, all_moves, AI, depth);
-}
+//////////minimax
 
 void AIPlayer::minimax(State& state, int depth) {
-    if (depth >= max_depth - 1) {
+    if (depth >= MAX_DEPTH - 1) {
         state.value = 0;
         return;
     }
@@ -84,14 +77,18 @@ void AIPlayer::minimax(State& state, int depth) {
 
     int val_found;
     if (state.AI_move) {
-        val_found = -max_points;
+        int minP, maxAI;
+        val_found = -MAX_POINTS;
         for (State& child : state.children) {
             minimax(child, depth+1);
+            // min(P), max(AI)
             int val = child.value;
             if (val > val_found) val_found = val;
         }
+        // val = min();
+        // if (val > val_found) val_found = val;
     } else {
-        val_found = max_points;
+        val_found = MAX_POINTS;
         for (State& child : state.children) {
             minimax(child, depth+1);
             int val = child.value;
@@ -102,6 +99,8 @@ void AIPlayer::minimax(State& state, int depth) {
     state.value = val_found;
 }
 
+
+/////ai player functions
 std::vector<Move> AIPlayer::getJumpMoves(const State& s) {
     if (s.children.empty()) return {};
 
@@ -121,8 +120,8 @@ std::vector<Move> AIPlayer::getJumpMoves(const State& s) {
 }
 
 Move AIPlayer::getMove(Board &board) {
-    std::vector<State> all_moves = getGameTree(board, true, 0);
-    //for (const State& s : all_moves) print_tree(s, 0);
+    // std::vector<State> all_moves = getGameTree(board, true, 0);
+    std::vector<State> all_moves = buildGameTree(board, true, 0);
 
     State best = all_moves[0];
     for (State& state : all_moves) {
@@ -131,8 +130,6 @@ Move AIPlayer::getMove(Board &board) {
     }
 
     jump_moves = getJumpMoves(best);
-
-    //print_tree(best, 0);
 
     std::cout << best.value << std::endl;
 
@@ -144,4 +141,3 @@ Move AIPlayer::getChainMove(Board &board, std::vector<Move> jumps) {
     Move jump = jump_moves.back();
     return jump;
 }
-

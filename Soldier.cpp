@@ -8,12 +8,7 @@ Soldier::Soldier(Color color, char symbol) : Piece(color, symbol)
     direction = color == Color::RED ? RED_DIRECTIONS : BLACK_DIRECTIONS;  
 }
 
-bool (*Soldier::getValidator())(const Board& board, const Move &move, Color color)
-{
-    return Soldier::isValidMove;
-}
-
-bool Soldier::isValidMove(const Board& board, const Move& move, Color playerColor){
+bool Soldier::isValidMove(const Board& board, const Move& move, Color playerColor)const{
     if(!board.isInsideBoard(move.from) || !board.isInsideBoard(move.to)) return false;
 
     auto piece = board.getPiece(move.from);
@@ -25,28 +20,13 @@ bool Soldier::isValidMove(const Board& board, const Move& move, Color playerColo
     if(!board.isEmpty(move.to)) return false;
 
     //check that  move was done in the right direction
-    // TODO - replace if color to generic direction
-    if(piece->getColor() == Color::RED)
-    {
-        if(move.from.row == move.to.row - 1 && abs(move.from.col - move.to.col) == 1) return true; //normal step
-        if(move.from.row == move.to.row - 2 && abs(move.from.col - move.to.col) == 2){ //eat
-            int midRow = (move.from.row + move.to.row) / 2;
-            int midCol = (move.from.col + move.to.col) / 2;
-            auto betweenPiece = board.getPiece({midRow, midCol});
-            return (betweenPiece && betweenPiece->getColor() == Color::BLACK);
-        }
-
-        return false;
+    int step = (piece->getColor() == Color::RED) ? -1 : 1;    
+    if(move.from.row == move.to.row + step && abs(move.from.col - move.to.col) == 1) return true; //normal step
+    if(move.from.row == move.to.row + 2 * step && abs(move.from.col - move.to.col) == 2){ //eat
+        int midRow = (move.from.row + move.to.row) / 2;
+        int midCol = (move.from.col + move.to.col) / 2;
+        auto betweenPiece = board.getPiece({midRow, midCol});
+        return (betweenPiece && betweenPiece->getColor() != piece->getColor());
     }
-    else
-    {
-        if(move.from.row == move.to.row + 1 && abs(move.from.col - move.to.col) == 1) return true; //normal step
-        if(move.from.row == move.to.row + 2 && abs(move.from.col - move.to.col) == 2){ //eat
-            int midRow = (move.from.row + move.to.row) / 2;
-            int midCol = (move.from.col + move.to.col) / 2;
-            auto betweenPiece = board.getPiece({midRow, midCol});
-            return (betweenPiece && betweenPiece->getColor() == Color::RED);
-        }
-        return false;
-    }
+    return false;
 }

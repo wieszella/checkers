@@ -4,7 +4,5 @@
 class Soldier : public Piece {
 public:
     Soldier(Color color, char symbol);
-    ~Soldier()=default;
-    bool (*getValidator())(const Board& board, const Move &move, Color color)override;
-    static bool isValidMove(const Board& board, const Move &move, Color color);
+    bool isValidMove(const Board&, const Move&, Color) const override;
 };

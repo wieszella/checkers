@@ -5,7 +5,7 @@
 #include <algorithm>
 
 
-bool isNumeric(const std::string& str) { // TODO - deal with this function better
+bool HumanPlayer::isNumeric(const std::string& str) {
     for (char c : str) {
         if (!isdigit(c)) {
             return false;
@@ -20,7 +20,7 @@ Move HumanPlayer::getMove(Board &board){
     Position from, to;
     while (true) {
         std::string x, y;
-        std::cout << "Enter the row and column of the piece you want to move (for example, 2 3): ";
+        std::cout << "Enter the row and column of the piece you want to move (for example, 2 3): \n";
         std::cin >> x >> y;
 
         if (!isNumeric(x) || !isNumeric(y)) {
@@ -36,7 +36,7 @@ Move HumanPlayer::getMove(Board &board){
             continue;
         }
 
-        std::cout << "Enter the row and column of the destination square (for example, 3 4): ";
+        std::cout << "Enter the row and column of the destination square (for example, 3 4): \n";
         std::cin >> x >> y;
 
         if (!isNumeric(x) || !isNumeric(y)) {
@@ -62,6 +62,7 @@ Move HumanPlayer::getChainMove(Board &board, std::vector<Move> jumps){
         
         if(response == 'Y'){
             do {
+                board.print();
                 chain = getMove(board);
             } while(std::count(jumps.begin(), jumps.end(), chain) == 0);
         }

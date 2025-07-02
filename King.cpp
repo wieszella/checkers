@@ -6,12 +6,7 @@ King::King(Color color, char symbol) : Piece(color, symbol)
     direction = {{1, -1}, {1, 1}, {-1, -1}, {-1, 1}};
 }
 
-bool (*King::getValidator())(const Board& board, const Move &move, Color color)
-{
-    return King::isValidMove;
-}
-
-bool King::isValidMove(const Board& board, const Move& move, Color playerColor){
+bool King::isValidMove(const Board& board, const Move& move, Color playerColor)const{
     if(!board.isInsideBoard(move.from) || !board.isInsideBoard(move.to)) return false;
     
     auto piece = board.getPiece(move.from);

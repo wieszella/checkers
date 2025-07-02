@@ -1,25 +1,24 @@
 #include "Board.h"
-#include "Piece.h"
 #include "Soldier.h"
 #include "King.h"
 #include <iostream>
 
 Board::Board(){ //Initialize the board to an empty state (no pieces yet).
-    for (int row = 0; row < BOARD_SIZE; ++row)
-        for (int col = 0; col < BOARD_SIZE; ++col)
+    for (int row = 0; row < BOARD_SIZE; row++)
+        for (int col = 0; col < BOARD_SIZE; col++)
             grid[row][col] = nullptr;
 }
 
 Board::Board(const Board& other) {
-    for (int row = 0; row < BOARD_SIZE; ++row)
-        for (int col = 0; col < BOARD_SIZE; ++col)
+    for (int row = 0; row < BOARD_SIZE; row++)
+        for (int col = 0; col < BOARD_SIZE; col++)
             grid[row][col] = other.grid[row][col];
 }
 
 void Board::setup(){
-    for (int row = 0; row < BOARD_SIZE; ++row) 
+    for (int row = 0; row < BOARD_SIZE; row++) 
     {
-        for (int col = 0; col < BOARD_SIZE; ++col) 
+        for (int col = 0; col < BOARD_SIZE; col++) 
         {
             if ((row + col) % 2 != 0) 
             {
@@ -70,16 +69,16 @@ void Board::movePiece(const Position& from, const Position& to){
 
 void Board::print() const{
     std::cout << "  ";
-    for (int i = 0; i < BOARD_SIZE; ++i) 
+    for (int i = 0; i < BOARD_SIZE; i++) 
     {
         std::cout << i << " ";
     }
     std::cout << "\n";
 
-    for (int row = 0; row < BOARD_SIZE; ++row) 
+    for (int row = 0; row < BOARD_SIZE; row++) 
     {
         std::cout << row << " ";
-        for (int col = 0; col < BOARD_SIZE; ++col) 
+        for (int col = 0; col < BOARD_SIZE; col++) 
         {
             auto piece = grid[row][col];
             if (piece == nullptr) {
