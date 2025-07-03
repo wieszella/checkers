@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <bits/stdc++.h>
 
-AIPlayer::AIPlayer(Color color) : color(color), opColor(color == Color::RED ? Color::BLACK : Color::RED), MAX_DEPTH(5), MAX_POINTS(10){}
+AIPlayer::AIPlayer(Color color) : color(color), opColor(color == Color::RED ? Color::BLACK : Color::RED), MAX_DEPTH(5), MAX_POINTS(100){}
 
 void print_tree(const State& s, int indent) { //for debug purposes
     std::cout << std::string(indent, ' ') << s.AI_move << s.value << "(" << s.move.from.row << "," << s.move.from.col << ") -> (" << s.move.to.row << "," << s.move.to.col << ")\n";
@@ -65,14 +65,14 @@ std::vector<State> AIPlayer::buildGameTree(Board board, bool isAIPlayerTurn, int
 
 //////////minimax
 
-void AIPlayer::minimax(State& state, int depth) {
+void AIPlayer::minimax(State& state, int depth, int alpha, int beta) {
     if (depth >= MAX_DEPTH - 1 || state.children.empty()) {
         state.value = evaluate(state.board, state.AI_move);
         return;
     }
 
     for(State& child: state.children){
-        minimax(child, depth+1);
+        minimax(child, depth+1, alpha, beta);
     }
 
     int val;
@@ -81,8 +81,12 @@ void AIPlayer::minimax(State& state, int depth) {
     if (state.AI_move)
     {
         val = std::max(maxAI, minP);
+        alpha = std::max(alpha, val);
+        if(beta <= alpha) return;
     } else {
         val = std::min(maxAI, minP);
+        beta = std::min(beta, val);
+        if(beta <= alpha) return;
     }
     state.value = val;
 }
@@ -147,7 +151,7 @@ Move AIPlayer::getMove(Board &board) {
 
     State best = all_moves[0];
     for (State& state : all_moves) {
-        minimax(state, 0);
+        minimax(state, 0, -MAX_POINTS, MAX_POINTS);
         if (state.value > best.value) best = state;
     }
 
