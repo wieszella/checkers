@@ -1,21 +1,23 @@
 #include "MoveGenerator.h"
 #include <iostream>
 
-std::vector<Move> MoveGenerator::getLegalMovesForPos(const Board& board, const Position& pos){
+std::vector<Move> MoveGenerator::getLegalMovesForPos(const Board& board, const Position& pos, bool allowBackwardJump = false){
     std::vector<Move> legalMoves;
     auto piece = board.getPiece(pos);
     if (!piece) return legalMoves;
 
     Color color = piece->getColor();
 
-    for (const auto& dir : piece->getDirections()) {
+    std::vector<Direction> kings_directions = {{1, -1}, {1, 1}, {-1, -1}, {-1, 1}};
+    std::vector<Direction> directions = allowBackwardJump ? kings_directions : piece->getDirections();
+    for (const auto& dir : directions) {
         int r = pos.row + dir.dRow;
         int c = pos.col + dir.dCol;
         
         while (board.isInsideBoard({r, c})) {
             Move move{pos, {r, c}};
             
-            if (piece->isValidMove(board, move, color))
+            if (piece->isValidMove(board, move, color, allowBackwardJump))
             legalMoves.push_back(move);
             r += dir.dRow;
             c += dir.dCol;

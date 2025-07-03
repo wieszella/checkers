@@ -37,7 +37,10 @@ class AIPlayer : public Player {
 public:
     AIPlayer(Color color);
 
-
+    std::vector<State> getGameTreesFromMoves(Board board, std::vector<Move> moves, bool AI, int depth);
+    std::vector<State> getGameTreeJump(Board board, bool AI, Position pos, int depth);
+    std::vector<State> getGameTree(Board board, bool AI, int depth);
+    
     std::vector<Move> getJumpMoves(const State& s);
     Move getMove(Board &board)override;
     Move getChainMove(Board &board, std::vector<Move> jumps)override;

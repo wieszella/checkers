@@ -9,7 +9,7 @@ public:
     
     std::vector<Move> getChainJumps(const Board& board, std::vector<Move> moves, Color playerColor);
 
-    std::vector<Move> getLegalMovesForPos(const Board&, const Position& pos);
+    std::vector<Move> getLegalMovesForPos(const Board&, const Position& pos, bool allowBackwardJump);
     
     // Get all legal moves for a player (used to detect if game is over)
     std::vector<Move> getAllLegalMoves(const Board& board, Color playerColor);

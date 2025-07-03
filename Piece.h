@@ -31,5 +31,5 @@ public:
     virtual std::vector<Direction> getDirections()const;
     
     virtual PieceType getType()const = 0;
-    virtual bool isValidMove(const Board&, const Move&, Color) const = 0;
+    virtual bool isValidMove(const Board&, const Move&, Color,bool allowBackwardJump) const = 0;
 };

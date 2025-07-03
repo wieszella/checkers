@@ -10,7 +10,7 @@ Soldier::Soldier(Color color, char symbol) : Piece(color, symbol)
 
 PieceType Soldier::getType()const{ return PieceType::SOLDIER;}
 
-bool Soldier::isValidMove(const Board& board, const Move& move, Color playerColor)const{
+bool Soldier::isValidMove(const Board& board, const Move& move, Color playerColor, bool allowBackwardJump)const{
     if(!board.isInsideBoard(move.from) || !board.isInsideBoard(move.to)) return false;
 
     auto piece = board.getPiece(move.from);
@@ -22,13 +22,23 @@ bool Soldier::isValidMove(const Board& board, const Move& move, Color playerColo
     if(!board.isEmpty(move.to)) return false;
 
     //check that  move was done in the right direction
-    int step = (piece->getColor() == Color::RED) ? -1 : 1;    
-    if(move.from.row == move.to.row + step && abs(move.from.col - move.to.col) == 1) return true; //normal step
-    if(move.from.row == move.to.row + 2 * step && abs(move.from.col - move.to.col) == 2){ //eat
+    int step = (piece->getColor() == Color::RED) ? -1 : 1;   
+    
+    int rowDiff = move.from.row - move.to.row;
+    int colDiff = abs(move.to.col - move.from.col);
+
+    if (rowDiff == step && colDiff == 1) {//normal step
+        return true;
+    }
+
+    if(colDiff == 2) { //jump
         int midRow = (move.from.row + move.to.row) / 2;
         int midCol = (move.from.col + move.to.col) / 2;
         auto betweenPiece = board.getPiece({midRow, midCol});
-        return (betweenPiece && betweenPiece->getColor() != piece->getColor());
+        if(betweenPiece && betweenPiece->getColor() != piece->getColor()){//oponnent piece
+            if(rowDiff == 2 * step) return true;
+            if(allowBackwardJump && abs(rowDiff) == 2) return true;
+        }
     }
     return false;
 }

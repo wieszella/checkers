@@ -39,7 +39,7 @@ void Game::play() {
         do {
             move =player->getMove(board);
             
-            valid = board.getPiece(move.from)->isValidMove(board, move, currentTurn);
+            valid = board.getPiece(move.from)->isValidMove(board, move, currentTurn, false);
 
             if (!valid) {
                 std::cout << "Invalid move. Try again.\n";
@@ -52,7 +52,7 @@ void Game::play() {
         moveExecutor->apply(board, move);
 
         while (isEat) {
-            auto moves = moveGenerator->getLegalMovesForPos(board, move.to);
+            auto moves = moveGenerator->getLegalMovesForPos(board, move.to, true);
             auto jumps = moveGenerator->getChainJumps(board, moves, currentTurn);
 
             auto move = player->getChainMove(board, jumps);

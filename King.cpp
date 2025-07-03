@@ -8,7 +8,7 @@ King::King(Color color, char symbol) : Piece(color, symbol)
 
 PieceType King::getType()const{return PieceType::KING;}
 
-bool King::isValidMove(const Board& board, const Move& move, Color playerColor)const{
+bool King::isValidMove(const Board& board, const Move& move, Color playerColor, bool allowBackwardJump = true)const{
     if(!board.isInsideBoard(move.from) || !board.isInsideBoard(move.to)) return false;
     
     auto piece = board.getPiece(move.from);

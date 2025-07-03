@@ -10,7 +10,7 @@ AIPlayer::AIPlayer(Color color) : color(color), opColor(color == Color::RED ? Co
 
 void print_tree(const State& s, int indent) { //for debug purposes
     std::cout << std::string(indent, ' ') << s.AI_move << s.value << "(" << s.move.from.row << "," << s.move.from.col << ") -> (" << s.move.to.row << "," << s.move.to.col << ")\n";
-    for (const State& c : s.children) print_tree(c, indent+1);
+    for (const State& c : s.children) print_tree(c, indent * 2);
 }
 
 
@@ -24,7 +24,7 @@ std::vector<State> AIPlayer::buildGameTree(Board board, bool isAIPlayerTurn, int
 
     //Get legal moves
     if (chainFromPos.has_value()) {
-        legalMoves = moveGenerator->getLegalMovesForPos(board, chainFromPos.value());
+        legalMoves = moveGenerator->getLegalMovesForPos(board, chainFromPos.value(), true);
         legalMoves = moveGenerator->getChainJumps(board, legalMoves, currentPlayerColor);
 
         // If no more chain jumps from this position, it's the other player's turn
@@ -66,9 +66,13 @@ std::vector<State> AIPlayer::buildGameTree(Board board, bool isAIPlayerTurn, int
 //////////minimax
 
 void AIPlayer::minimax(State& state, int depth) {
-    if (depth >= MAX_DEPTH - 1) {
+    if (depth >= MAX_DEPTH - 1 || state.children.empty()) {
         state.value = evaluate(state.board, state.AI_move);
         return;
+    }
+
+    for(State& child: state.children){
+        minimax(child, depth+1);
     }
 
     int val;
@@ -86,25 +90,36 @@ void AIPlayer::minimax(State& state, int depth) {
 int AIPlayer::evaluate(const Board& board, bool isAI)const
 {
     double king_weight = 2;
-    return (king_weight * board.countPieceColor(color, PieceType::KING) + board.countPieceColor(color, PieceType::SOLDIER)) - 
+    int value = (king_weight * board.countPieceColor(color, PieceType::KING) + board.countPieceColor(color, PieceType::SOLDIER)) - 
         (king_weight * board.countPieceColor(opColor, PieceType::KING) + board.countPieceColor(opColor, PieceType::SOLDIER));
+    return value;
 }
 
 int AIPlayer::getMax(std::vector<State> children)const
 {
     int max = - MAX_POINTS;
+    bool hasAI = false;
     for(State child: children)
         if(child.value > max && child.AI_move)
+        {
             max = child.value;
+            hasAI = true;
+        }
+    if(!hasAI) return getMin(children);
     return max;
 }
 
 int AIPlayer::getMin(std::vector<State> children)const
 {
     int min = MAX_POINTS;
+    bool hasP = false;
     for(State child: children)
         if(child.value < min && !child.AI_move)
+        {
             min = child.value;
+            hasP = true;
+        }
+    if(!hasP) return getMax(children);
     return min;
 }
 
@@ -122,13 +137,12 @@ std::vector<Move> AIPlayer::getJumpMoves(const State& s) {
 
     if (best.AI_move) {
         std::vector<Move> jumps = getJumpMoves(best);
-        jumps.push_back(best.move); // TODO - should it be push back or insert
+        jumps.push_back(best.move); 
         return jumps;
     } else return {};
 }
 
 Move AIPlayer::getMove(Board &board) {
-    // std::vector<State> all_moves = getGameTree(board, true, 0);
     std::vector<State> all_moves = buildGameTree(board, true, 0);
 
     State best = all_moves[0];
@@ -138,8 +152,6 @@ Move AIPlayer::getMove(Board &board) {
     }
 
     jump_moves = getJumpMoves(best);
-
-    std::cout << best.value << std::endl;
 
     return best.move;
 }
