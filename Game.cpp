@@ -20,7 +20,7 @@ bool Game::hasLegalMoves(Color color) const {
 
 void Game::play() {
     while (true) {
-        system("cls");
+        system("cls"); //if use linux this wont work
         board.print();
 
         //end game condition

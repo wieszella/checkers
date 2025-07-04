@@ -13,10 +13,11 @@ int main() {
     std::shared_ptr<Player> blackHumanPlayer = std::make_shared<HumanPlayer>();
     std::shared_ptr<Player> blackAIPlayer = std::make_shared<AIPlayer>(Color::BLACK);
     
-    do{
+    do
+    {
         std::cout << "do you want to play againt a human(1) or a machine(2)?" << std::endl;
         std::cin >> res;
-    }while(res != "1" && res != "2");
+    } while(res != "1" && res != "2");
     // Start game
     std::shared_ptr<Player> blackPlayer = (res == "1") ? blackHumanPlayer : blackAIPlayer;
     Game game(redPlayer, blackPlayer);

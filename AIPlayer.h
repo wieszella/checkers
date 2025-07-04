@@ -32,14 +32,10 @@ class AIPlayer : public Player {
     int getMax(std::vector<State> children)const;
     int getMin(std::vector<State> children)const;
     std::vector<State> buildGameTree(Board board, bool isAIPlayerTurn, int depth, std::optional<Position> forceJumpPos = std::nullopt);
-    void minimax(State& state, int depth, int alpha, int beta);
+    void minimax(State& state, int depth);
 
 public:
     AIPlayer(Color color);
-
-    std::vector<State> getGameTreesFromMoves(Board board, std::vector<Move> moves, bool AI, int depth);
-    std::vector<State> getGameTreeJump(Board board, bool AI, Position pos, int depth);
-    std::vector<State> getGameTree(Board board, bool AI, int depth);
     
     std::vector<Move> getJumpMoves(const State& s);
     Move getMove(Board &board)override;

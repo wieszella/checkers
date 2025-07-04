@@ -65,14 +65,15 @@ std::vector<State> AIPlayer::buildGameTree(Board board, bool isAIPlayerTurn, int
 
 //////////minimax
 
-void AIPlayer::minimax(State& state, int depth, int alpha, int beta) {
+void AIPlayer::minimax(State& state, int depth) {
     if (depth >= MAX_DEPTH - 1 || state.children.empty()) {
         state.value = evaluate(state.board, state.AI_move);
         return;
     }
 
+    
     for(State& child: state.children){
-        minimax(child, depth+1, alpha, beta);
+        minimax(child, depth+1);
     }
 
     int val;
@@ -81,12 +82,8 @@ void AIPlayer::minimax(State& state, int depth, int alpha, int beta) {
     if (state.AI_move)
     {
         val = std::max(maxAI, minP);
-        alpha = std::max(alpha, val);
-        if(beta <= alpha) return;
     } else {
         val = std::min(maxAI, minP);
-        beta = std::min(beta, val);
-        if(beta <= alpha) return;
     }
     state.value = val;
 }
@@ -149,15 +146,15 @@ std::vector<Move> AIPlayer::getJumpMoves(const State& s) {
 Move AIPlayer::getMove(Board &board) {
     std::vector<State> all_moves = buildGameTree(board, true, 0);
 
-    State best = all_moves[0];
-    for (State& state : all_moves) {
-        minimax(state, 0, -MAX_POINTS, MAX_POINTS);
-        if (state.value > best.value) best = state;
+    int best = 0;
+    for (int i=0; i<all_moves.size(); i++) {
+        minimax(all_moves[i], 0);
+        if (all_moves[i].value > all_moves[best].value) best = i;
     }
 
     jump_moves = getJumpMoves(best);
 
-    return best.move;
+    return all_moves[best].move;
 }
 
 Move AIPlayer::getChainMove(Board &board, std::vector<Move> jumps) {
