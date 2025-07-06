@@ -37,7 +37,7 @@ std::vector<Move> MoveGenerator::getAllLegalMoves(const Board& board, Color play
             auto piece = board.getPiece(pos);
             
             if (piece && piece->getColor() == playerColor) {
-                auto moves = getLegalMovesForPos(board, pos, false);
+                auto moves = getLegalMovesForPos(board, pos, piece->getType() == PieceType::KING);
                 allMoves.insert(allMoves.end(), moves.begin(), moves.end()); //inserts to allMoves evry move in moves
             }
         }
@@ -72,4 +72,8 @@ std::vector<Move> MoveGenerator::getChainJumps(const Board& board, std::vector<M
             jumps.push_back(move);
     }
     return jumps;
+}
+
+bool MoveGenerator::hasLegalMoves(const Board& board ,Color color){
+    return !getAllLegalMoves(board, color).empty();
 }

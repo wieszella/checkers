@@ -74,20 +74,26 @@ void AIPlayer::minimax(State& state, int depth){
     int minP = MAX_POINTS;
 
     for(State& child: state.children){
-        if(minP <= maxAI){
-            if(state.AI_move && ! child.AI_move) continue;
+        if(minP <= maxAI){ 
+            //implemented pruning- if at any point minP <= maxAI you can stop computing for the cases that 
+            if(state.AI_move && !child.AI_move) continue;
             if(!state.AI_move && child.AI_move) continue;
         }
         minimax(child, depth+1);
+        
         if(child.AI_move) maxAI = std::max(child.value, maxAI);
         else minP = std::min(child.value, minP);
     }
+
     if(state.AI_move) state.value = std::max(maxAI, minP);
     else state.value = std::min(maxAI, minP);
 }
 
 int AIPlayer::evaluate(const Board& board, bool isAI)const
 {
+    if(!moveGenerator ->hasLegalMoves(board, color)) return -MAX_POINTS;
+    if(!moveGenerator ->hasLegalMoves(board, opColor)) return MAX_POINTS;
+
     double king_weight = 2;
     int value = (king_weight * board.countPieceColor(color, PieceType::KING) + board.countPieceColor(color, PieceType::SOLDIER)) - 
         (king_weight * board.countPieceColor(opColor, PieceType::KING) + board.countPieceColor(opColor, PieceType::SOLDIER));

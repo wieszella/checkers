@@ -14,17 +14,13 @@ std::shared_ptr<Player> Game::currentPlayer() {
     return (currentTurn == Color::RED) ? redPlayer : blackPlayer;
 }
 
-bool Game::hasLegalMoves(Color color) const {
-    return !moveGenerator->getAllLegalMoves(board, color).empty();
-}
-
 void Game::play() {
     while (true) {
         system("cls"); //if use linux this wont work
         board.print();
 
         //end game condition
-        if (!hasLegalMoves(currentTurn)) {
+        if (!moveGenerator->hasLegalMoves(board, currentTurn)) {
             std::cout << "Game over! " << (currentTurn == Color::RED ? "Black" : "Red") << " wins.\n";
             break;
         }

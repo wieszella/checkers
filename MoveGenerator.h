@@ -6,6 +6,7 @@
 class MoveGenerator {
 public:
     bool isEatMove(const Board& board, Move& move, Color playerColor);
+    bool hasLegalMoves(const Board& board, Color color);
     
     std::vector<Move> getChainJumps(const Board& board, std::vector<Move> moves, Color playerColor);
 

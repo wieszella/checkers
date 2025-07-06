@@ -17,7 +17,7 @@ private:
     
     std::shared_ptr<Player> currentPlayer();
     void switchTurn();
-    bool hasLegalMoves(Color color) const;
+    
 public:
     Game(std::shared_ptr<Player> red, std::shared_ptr<Player> black);
     void play();
