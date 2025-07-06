@@ -64,28 +64,26 @@ std::vector<State> AIPlayer::buildGameTree(Board board, bool isAIPlayerTurn, int
 }
 
 //////////minimax
-
-void AIPlayer::minimax(State& state, int depth) {
+void AIPlayer::minimax(State& state, int depth){
     if (depth >= MAX_DEPTH - 1 || state.children.empty()) {
         state.value = evaluate(state.board, state.AI_move);
         return;
     }
 
-    
-    for(State& child: state.children){
-        minimax(child, depth+1);
-    }
+    int maxAI = - MAX_POINTS;
+    int minP = MAX_POINTS;
 
-    int val;
-    int maxAI= getMax(state.children);
-    int minP = getMin(state.children);
-    if (state.AI_move)
-    {
-        val = std::max(maxAI, minP);
-    } else {
-        val = std::min(maxAI, minP);
+    for(State& child: state.children){
+        if(minP <= maxAI){
+            if(state.AI_move && ! child.AI_move) continue;
+            if(!state.AI_move && child.AI_move) continue;
+        }
+        minimax(child, depth+1);
+        if(child.AI_move) maxAI = std::max(child.value, maxAI);
+        else minP = std::min(child.value, minP);
     }
-    state.value = val;
+    if(state.AI_move) state.value = std::max(maxAI, minP);
+    else state.value = std::min(maxAI, minP);
 }
 
 int AIPlayer::evaluate(const Board& board, bool isAI)const
@@ -94,34 +92,6 @@ int AIPlayer::evaluate(const Board& board, bool isAI)const
     int value = (king_weight * board.countPieceColor(color, PieceType::KING) + board.countPieceColor(color, PieceType::SOLDIER)) - 
         (king_weight * board.countPieceColor(opColor, PieceType::KING) + board.countPieceColor(opColor, PieceType::SOLDIER));
     return value;
-}
-
-int AIPlayer::getMax(std::vector<State> children)const
-{
-    int max = - MAX_POINTS;
-    bool hasAI = false;
-    for(State child: children)
-        if(child.value > max && child.AI_move)
-        {
-            max = child.value;
-            hasAI = true;
-        }
-    if(!hasAI) return getMin(children);
-    return max;
-}
-
-int AIPlayer::getMin(std::vector<State> children)const
-{
-    int min = MAX_POINTS;
-    bool hasP = false;
-    for(State child: children)
-        if(child.value < min && !child.AI_move)
-        {
-            min = child.value;
-            hasP = true;
-        }
-    if(!hasP) return getMax(children);
-    return min;
 }
 
 /////ai player functions
@@ -159,6 +129,6 @@ Move AIPlayer::getMove(Board &board) {
 }
 
 Move AIPlayer::getChainMove(Board &board, std::vector<Move> jumps) {
-    if (jumps.size() == 0) return Move();
+    if (jump_moves.size() == 0) return Move();
     return jump_moves.back();
 }
