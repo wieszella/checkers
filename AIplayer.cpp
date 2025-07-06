@@ -152,6 +152,7 @@ Move AIPlayer::getMove(Board &board) {
         if (all_moves[i].value > all_moves[best].value) best = i;
     }
 
+    //update possible jumps
     jump_moves = getJumpMoves(best);
 
     return all_moves[best].move;

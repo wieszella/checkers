@@ -1,15 +1,17 @@
 #include "MoveGenerator.h"
 #include <iostream>
 
-std::vector<Move> MoveGenerator::getLegalMovesForPos(const Board& board, const Position& pos, bool allowBackwardJump = false){
+std::vector<Move> MoveGenerator::getLegalMovesForPos(const Board& board, const Position& pos, bool allowBackwardJump){
     std::vector<Move> legalMoves;
     auto piece = board.getPiece(pos);
     if (!piece) return legalMoves;
 
     Color color = piece->getColor();
-
-    std::vector<Direction> kings_directions = {{1, -1}, {1, 1}, {-1, -1}, {-1, 1}};
-    std::vector<Direction> directions = allowBackwardJump ? kings_directions : piece->getDirections();
+    
+    const auto& directions = allowBackwardJump 
+    ? DirectionMap.at({color, PieceType::KING})
+    : DirectionMap.at({color, PieceType::SOLDIER});
+    
     for (const auto& dir : directions) {
         int r = pos.row + dir.dRow;
         int c = pos.col + dir.dCol;
@@ -17,7 +19,7 @@ std::vector<Move> MoveGenerator::getLegalMovesForPos(const Board& board, const P
         while (board.isInsideBoard({r, c})) {
             Move move{pos, {r, c}};
             
-            if (piece->isValidMove(board, move, color, allowBackwardJump))
+            if (piece->isValidMove(board, move, color, directions))
             legalMoves.push_back(move);
             r += dir.dRow;
             c += dir.dCol;
@@ -35,7 +37,7 @@ std::vector<Move> MoveGenerator::getAllLegalMoves(const Board& board, Color play
             auto piece = board.getPiece(pos);
             
             if (piece && piece->getColor() == playerColor) {
-                auto moves = getLegalMovesForPos(board, pos);
+                auto moves = getLegalMovesForPos(board, pos, false);
                 allMoves.insert(allMoves.end(), moves.begin(), moves.end()); //inserts to allMoves evry move in moves
             }
         }

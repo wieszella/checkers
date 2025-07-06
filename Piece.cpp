@@ -11,7 +11,3 @@ Color Piece::getColor() const
 {
     return color;
 }
-
-std::vector<Direction> Piece::getDirections()const{
-    return direction;
-}
