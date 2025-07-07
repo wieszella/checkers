@@ -129,7 +129,7 @@ Move AIPlayer::getMove(Board &board) {
     }
 
     //update possible jumps
-    jump_moves = getJumpMoves(best);
+    jump_moves = getJumpMoves(all_moves[best]);
 
     return all_moves[best].move;
 }
