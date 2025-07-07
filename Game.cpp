@@ -36,7 +36,7 @@ void Game::play() {
             std::vector<Direction> validDirections = DirectionMap.at({currentTurn, PieceType::SOLDIER});
             move = player->getMove(board);
             
-            valid = board.getPiece(move.from)->isValidMove(board, move, currentTurn, validDirections);
+            valid = (board.isInsideBoard(move.from) && board.getPiece(move.from)->isValidMove(board, move, currentTurn, validDirections));
 
             if (!valid) {
                 std::cout << "Invalid move. Try again.\n";
